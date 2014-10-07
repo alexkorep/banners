@@ -1,0 +1,6 @@
+do_build_campaigns:
+  #every: 15m
+  every: 10s
+  class: CampaignBuilder
+  args:
+  description: Runs the perform method in CampaignBuilder
