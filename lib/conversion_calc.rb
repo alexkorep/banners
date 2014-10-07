@@ -51,6 +51,15 @@ class ConversionCalc
         @campaigns[click.campaign_id][click.banner_id].revenue += amount
     end
 
+    def sort_compare(a, b)
+        puts "[#{a}, #{b}]"
+        if a.banner_performance.revenue
+            return a.banner_performance.revenue > b.banner_performance.revenue
+        end
+
+        return a.banner_performance.clicks > b.banner_performance.clicks
+    end
+
     def calculate_campaign(campaign_id, campaign)
         banners = Array.new
 
@@ -59,14 +68,35 @@ class ConversionCalc
         end
 
         # sort by revenue descending
-        banners.sort_by!{ |banner| -banner.banner_performance.revenue }
-        puts "[#{banners}]"
+        #banners.sort_by!{ |banner| -banner.banner_performance.revenue }
+        #puts "[before: #{banners}]\n"
+        banners.sort! do |a, b|
+            #puts "%%%[#{a}, #{b}]%%%\n"
+            if a.banner_performance.revenue
+                b.banner_performance.revenue <=> a.banner_performance.revenue
+            end
+
+            b.banner_performance.clicks <=> a.banner_performance.clicks
+        end
+        #puts "[after: #{banners}]\n"
+
+        # TODO look through banners array.
+        # 1. If there are more than 10 elements with revenue > 0, use these 10 elements
+        # 2. If there are 5 to 9 elements with revenue > 0, use these elements
+        # 3. If there are less than 5 elements with revenue > 0, pick these
+        # banners and add the next ones to have 5 in total
+        # 4 no banners with revenue - covered by 3
     end
 
     def calculate
         @campaigns.each_pair do |campaign_id, campaign|
             calculate_campaign(campaign_id, campaign)
         end
+    end
+
+    def get_top_banner_ids(campaign_id)
+        # TODO provide results
+        [1, 2]
     end
 
     def self.build_campaign(clicks_filename, conversions_filename)

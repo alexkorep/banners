@@ -18,6 +18,8 @@ class TestAdd < Test::Unit::TestCase
         calc.add_conversion(1, 3, 0.5)
         calc.calculate
 
+        assert_equal [1, 2], calc.get_top_banner_ids(1)
+        assert_equal [1], calc.get_top_banner_ids(2)
 =begin
         # Check recorded conversions per campaign
         assert_equal calc.get_conversions(campaign_id: 1), {1 => 1.0, 2 => 0}
