@@ -1,11 +1,11 @@
 task default: %w[runserver]
 
 task :devserver do
-  sh "rerun 'ruby hi.rb'"
+  sh "rerun 'ruby www/index.rb'"
 end
 
 task :runserver do
-  ruby 'hi.rb'
+  ruby 'www/index.rb'
 end
 
 task :test do

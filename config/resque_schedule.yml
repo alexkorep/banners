@@ -1,6 +1,9 @@
 do_build_campaigns:
   #every: 15m
-  every: 10s
+  every: 5s
+  # Run task every 15 minutes. We are running it 5 minutes in advance before
+  # the next 15 minutes interval starts.
+  #cron: "10,25,40,55 * * * *"
   class: CampaignBuilder
   args:
   description: Runs the perform method in CampaignBuilder
