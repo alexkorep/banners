@@ -9,7 +9,7 @@ task :runserver do
 end
 
 task :test do
-  ruby "tests/unittest.rb"
+  ruby "test/test_build_campaign.rb"
 end
 
 # Resque tasks
