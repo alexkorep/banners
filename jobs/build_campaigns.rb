@@ -3,14 +3,30 @@ require "csv"
 require "./config/config.rb"
 require "./lib/conversion_calc.rb"
 
+# Module to perform background task of building top banners out of scv files
+# Background tasks is executed in the beginning of every 15 minutes.
+#
+# Since this task takes time, the new banners will not be accessible, say
+# at 0:00:00, they will probably become accessible at 0:00:05.
+# TODO: To fix it we can calculate these values in advance, save to a separate
+#       Redis namespace and swap these namespaces at the beginning of every 15
+#       minutes.
 module CampaignBuilder
+    REDIS_EXPIRE_TIMEOUT = 16*60 #16 minutes
+
     def self.perform()
         calc = self.load_data
         calc.get_campaign_ids.each do |campaign_id|
             top_banners = calc.get_top_banner_ids(campaign_id)
-            Redis.current.set("campaign#{campaign_id}", top_banners.to_json)
-            #puts "Processed #{campaign_id}, top banners: #{top_banners}"
+
+            key = "campaign#{campaign_id}"
+            Redis.current.set(key, top_banners.to_json)
+            Redis.expire(key, REDIS_EXPIRE_TIMEOUT)
         end
+
+        # TODO we need cleanup the campaigns which are not active anymore
+        #      Now it's done by redis 16 minutes timeout, but it could lead to
+        #      campaign created at 0:00 can be still accessible at 0:15
     end
 
     def self.get_csv_file_num
