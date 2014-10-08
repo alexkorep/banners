@@ -24,7 +24,7 @@ namespace :resque do
 
     ENV['QUEUE'] = '*'
 
-    Resque.redis = 'localhost:6379'
+    Resque.redis = ENV.fetch("REDISTOGO_URL", 'redis://localhost:6379/')
 
     Resque.schedule = YAML.load_file('config/resque_schedule.yml')
 
