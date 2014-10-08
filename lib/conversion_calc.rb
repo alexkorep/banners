@@ -21,7 +21,7 @@ class ConversionCalc
         # Hash keyed by campaing_id. Each element is a hash keyed by banner_id.
         # Each element is a banner performance structure BannerPerformance
         @campaigns = Hash.new{
-            |hash, key| hash[key] = Hash.new{
+            |hash, key| hash[key] = Hash.new {
                 |hash2, key2| hash2[key2] = BannerPerformance.new(
                     clicks: 0, revenue: 0)
             }
@@ -30,6 +30,10 @@ class ConversionCalc
         # Hash keyed by banner_id. Each element is a click describing
         # structure, ClickAttr
         @clicks = Hash.new
+
+        # Hash keyed by campaign_id. Each element is array of top performing
+        # banner_ids
+        @top_banner_ids = Hash.new
     end
 
     def add_banner(banner_id, campaign_id)
@@ -44,7 +48,9 @@ class ConversionCalc
     def add_conversion(conversion_id, click_id, amount)
         click = @clicks[click_id]
         if click.nil?
-            # TODO Report data inconsistency error?
+            # TODO Report data inconsistency error. There are several options:
+            # 1. Raise an exception and handle it on CVS loader's level
+            # 2. Log it and/or report to the monitoring tool like NewRelic
             return
         end
 
@@ -80,23 +86,36 @@ class ConversionCalc
         end
         #puts "[after: #{banners}]\n"
 
-        # TODO look through banners array.
-        # 1. If there are more than 10 elements with revenue > 0, use these 10 elements
-        # 2. If there are 5 to 9 elements with revenue > 0, use these elements
-        # 3. If there are less than 5 elements with revenue > 0, pick these
-        # banners and add the next ones to have 5 in total
-        # 4 no banners with revenue - covered by 3
+        first_ten_banners = banners.first(10)
+        revenue_banner_count = 0
+        result_banner_ids = Array.new
+        first_ten_banners.each do |banner|
+            if banner.banner_performance.revenue
+                revenue_banner_count += 1
+                result_banner_ids.push(banner.banner_id)
+            end
+        end
+
+        if revenue_banner_count >= 5
+            # 1. If there are more than 10 elements with revenue > 0, use these 10 elements
+            # 2. If there are 5 to 9 elements with revenue > 0, use these elements
+            return result_banner_ids.first(revenue_banner_count)
+        else
+            # 3. If there are less than 5 elements with revenue > 0, pick these
+            # banners and add the next ones to have 5 in total
+            return result_banner_ids.first(5)
+        end
     end
 
     def calculate
         @campaigns.each_pair do |campaign_id, campaign|
-            calculate_campaign(campaign_id, campaign)
+            @top_banner_ids[campaign_id] = calculate_campaign(campaign_id,
+                                                              campaign)
         end
     end
 
     def get_top_banner_ids(campaign_id)
-        # TODO provide results
-        [1, 2]
+        @top_banner_ids[campaign_id]
     end
 
     def self.build_campaign(clicks_filename, conversions_filename)
