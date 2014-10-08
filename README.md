@@ -50,3 +50,50 @@ based on the second dataset etc....
 It is completely up to you which tools you will use: such as web­framework, database,
 web­server, app­server, background­worker, scheduler, NoSQL, RubyGems ........ But
 please provide us explanation why you have chosen a specific tool for your task.
+
+## Prerequisites
+
+You should have ```redis``` installed and running on localhost:6379
+
+## Installation
+
+```
+git clone https://github.com/alexkorep/banners.git
+cd banners
+bundle install
+```
+
+### Web application
+
+Web application is used to serve the banners to end users.
+
+#### Development mode:
+```
+rake devserver
+```
+Source code changes in this mode are picked up by ```rerun``` and web server is restarted automatically.
+
+#### Production mode
+```
+rake runserver
+```
+
+### Running scheduler
+```
+rake resque::scheduler
+
+```
+
+### Running background jobs
+
+```
+rake resque:work
+```
+
+### Dependencies
+
+* ```rerun``` is used to restart webserver when source code are changed
+* ```sinatra``` framework is used to create a simple web application.
+* ```resque``` and ```resque-scheduler``` are used to run the background jobs and schedule them.
+
+
