@@ -5,6 +5,7 @@ class TestAdd < Test::Unit::TestCase
     def test_build
         calc = ConversionCalc.new
 
+        # Create 3 campaigns with 11 banners, one impression for each
         (1..3).each do |campaign_id|
             (1..11).each do |banner_id|
                 calc.add_impression(banner_id, campaign_id)
@@ -45,6 +46,11 @@ class TestAdd < Test::Unit::TestCase
         calc.add_click(210, 6, campaign_id)
 
         calc.calculate
+
+
+        ########################################################################
+        # check calculation results
+        assert_equal [1,2,3], calc.get_campaign_ids.sort
 
         # check first campaign
         assert_equal [11,10,9,8,7,6,5,4,3,2], calc.get_top_banner_ids(1)

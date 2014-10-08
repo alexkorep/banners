@@ -114,4 +114,9 @@ class ConversionCalc
     def get_top_banner_ids(campaign_id)
         @top_banner_ids[campaign_id]
     end
+
+    # Return IDs of all campaigns
+    def get_campaign_ids
+        @top_banner_ids.keys
+    end
 end
