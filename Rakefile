@@ -12,6 +12,11 @@ task :test do
   ruby "test/test_build_campaign.rb"
 end
 
+task :warmup do
+    require_relative 'jobs/build_campaigns.rb'
+    CampaignBuilder.perform
+end
+
 # Resque tasks
 require 'resque/tasks'
 require 'resque/scheduler/tasks'
