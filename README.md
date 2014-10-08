@@ -80,7 +80,7 @@ rake runserver
 
 ### Running scheduler
 ```
-rake resque::scheduler
+rake resque:scheduler
 
 ```
 
