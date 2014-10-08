@@ -90,6 +90,11 @@ rake resque:scheduler
 rake resque:work
 ```
 
+### Running unit tests
+```
+rake test
+```
+
 ### Dependencies
 
 * ```rerun``` is used to restart webserver when source code are changed
