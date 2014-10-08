@@ -51,6 +51,16 @@ It is completely up to you which tools you will use: such as web­framework, dat
 web­server, app­server, background­worker, scheduler, NoSQL, RubyGems ........ But
 please provide us explanation why you have chosen a specific tool for your task.
 
+## General description
+
+* To avoid serving the same banner before all banners from the sequence are used, the cookie keeps last displayed banners (up to 10).
+* ```Redis``` is used to keep the top-performing banners because it's very fast and I have experience working with it.
+* ```sinatra``` framework is used to create the web application. It's quite simple and looks like a good fit for such a simple web application.
+* ```resque``` and ```resque-scheduler``` are used to run the background jobs and schedule them. It's ligntweight and based on ```Redis``` which makes it a good match.
+* ```Rake``` is used to run standard tasks like starting up the web sever, scheduler, background tasks, unit tests and warming up the cache.
+* ```Foreman``` is used to manage tasks like web server, scheduler and backgound job. It's been chosen because it's supported by Heroku.
+* Heroku hosting was chosen because it has a good support for Ruby application and it's free (unless you are runnig more than 1 task)
+
 ## Prerequisites
 
 You should have ```redis``` installed and running on localhost:6379
@@ -94,13 +104,6 @@ rake resque:work
 ```
 rake test
 ```
-
-### Dependencies
-
-* ```rerun``` is used to restart webserver when source code are changed
-* ```sinatra``` framework is used to create a simple web application.
-* ```resque``` and ```resque-scheduler``` are used to run the background jobs and schedule them.
-* 
 
 ### Load test
 
