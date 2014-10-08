@@ -77,7 +77,7 @@ bundle install
 
 Web application is used to serve the banners to end users.
 
-#### Development mode:
+#### Development mode
 ```
 rake devserver
 ```
@@ -105,7 +105,14 @@ rake resque:work
 rake test
 ```
 
-### Load test
+### Cache warmup
+
+```
+rake warmup
+```
+Runs banner processing job in foreground and fills the redis cache with results.
+
+### Stress-test
 
 ```
 $ siege -b -c 100 -t 1m http://calm-headland-8718.herokuapp.com/campaigns/2
