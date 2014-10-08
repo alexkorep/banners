@@ -23,7 +23,8 @@ module CampaignBuilder
 
             key = "campaign#{campaign_id}"
             Redis.current.set(key, top_banners.to_json)
-            Redis.expire(key, REDIS_EXPIRE_TIMEOUT)
+            Redis.current.expire(key, REDIS_EXPIRE_TIMEOUT)
+            puts "#{key} -> #{top_banners}"
         end
 
         # TODO we need cleanup the campaigns which are not active anymore
