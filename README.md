@@ -100,5 +100,26 @@ rake test
 * ```rerun``` is used to restart webserver when source code are changed
 * ```sinatra``` framework is used to create a simple web application.
 * ```resque``` and ```resque-scheduler``` are used to run the background jobs and schedule them.
+* 
 
+### Load test
 
+```
+$ siege -b -c 100 -t 1m http://calm-headland-8718.herokuapp.com/campaigns/2
+
+Lifting the server siege...      done.
+Transactions:		        5475 hits
+Availability:		       99.38 %
+Elapsed time:		       59.51 secs
+Data transferred:	        0.18 MB
+Response time:		        0.89 secs
+Transaction rate:	       92.00 trans/sec
+Throughput:		        0.00 MB/sec
+Concurrency:		       82.04
+Successful transactions:        5475
+Failed transactions:	          34
+Longest transaction:	       18.38
+Shortest transaction:	        0.35
+```
+
+92 transaction per second gives 5520 transaction per minute.
