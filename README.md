@@ -146,3 +146,6 @@ In case when amount of banner displays/clicks/conversion is too high to be handl
 In case when Redis is becoming a botteneck for web or jobs, it can be clustered. However redis clustering is currently in alfa stage and I'm not sure if it can be used in produciton.
 
 As an alternative, we can use multiple Redis instances, each of them will handle its own set of campaigns. This would require some changes to the web and background jobs codebase.
+
+### Test live
+http://calm-headland-8718.herokuapp.com/campaigns/2
