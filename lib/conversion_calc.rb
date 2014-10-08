@@ -27,11 +27,16 @@ class ConversionCalc
         @top_banner_ids = Hash.new
     end
 
-    def add_banner(banner_id, campaign_id)
+    # Add banner impression. Actually just creates banner performance record
+    # for given banner and campaign
+    # Warning: please don't call this method after add_click or add_conversion
+    # since it can overwrite existing banner performance data
+    def add_impression(banner_id, campaign_id)
         @campaigns[campaign_id][banner_id] = BannerPerformance.new(0, 0)
     end
 
     def add_click(click_id, banner_id, campaign_id)
+        # TODO what if @campaigns[campaign_id][banner_id] doesn't exist?
         @campaigns[campaign_id][banner_id].clicks += 1
         @clicks[click_id] = ClickAttr.new(campaign_id, banner_id)
     end
@@ -66,21 +71,21 @@ class ConversionCalc
         # we can increase performance by finding them without sorting,
         # which would give O(N) time complexity instead of O(N*lnN)
         banners.sort! do |a, b|
-            if a.banner_performance.revenue
+            if a.banner_performance.revenue > 0
                 b.banner_performance.revenue <=> a.banner_performance.revenue
+            else
+                b.banner_performance.clicks <=> a.banner_performance.clicks
             end
-
-            b.banner_performance.clicks <=> a.banner_performance.clicks
         end
 
         first_ten_banners = banners.first(10)
         revenue_banner_count = 0
         result_banner_ids = Array.new
         first_ten_banners.each do |banner|
-            if banner.banner_performance.revenue
+            if banner.banner_performance.revenue > 0
                 revenue_banner_count += 1
-                result_banner_ids.push(banner.banner_id)
             end
+            result_banner_ids.push(banner.banner_id)
         end
 
         if revenue_banner_count >= 5
