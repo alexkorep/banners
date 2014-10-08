@@ -1,48 +1,43 @@
 require "redis"
+require "csv"
 require "./config/config.rb"
+require "./lib/conversion_calc.rb"
 
 module CampaignBuilder
-    @queue = :my_job_queue
-
     def self.perform()
-        Redis.current.set("mykey", "hello world")
-
-        # Do anything here, like access models, etc
-        puts "Doing my job"
-        #puts "[#{settings.redis_connection_string}]xxx"
-
-        #@redis.set("mykey", "hello world")
+        calc = self.load_data
+        calc.get_campaign_ids.each do |campaign_id|
+            top_banners = calc.get_top_banner_ids(campaign_id)
+            Redis.current.set("campaign#{campaign_id}", top_banners.to_json)
+            #puts "Processed #{campaign_id}, top banners: #{top_banners}"
+        end
     end
 
-    def self.build_campaign
-        # Hash, key is click_id, value is <banner_id>|<campaign_id>
-        banner_by_click = Hash.new
-        campaign_by_click = Hash.new
+    def self.load_data
+        calc = ConversionCalc.new
+
+        CSV.foreach(File.dirname(__FILE__) +'/../csv/1/impressions_1.csv') do |row|
+            banner_id = row[0]
+            campaign_id = row[1]
+            calc.add_impression(banner_id, campaign_id)
+        end
+
         CSV.foreach(File.dirname(__FILE__) +'/../csv/1/clicks_1.csv') do |row|
             click_id = row[0]
             banner_id = row[1]
             campaign_id = row[2]
-            banner_by_click[click_id] = banner_id
-            campaign_by_click[click_id] = campaign_id
+            calc.add_click(click_id, banner_id, campaign_id)
         end
 
-        # Total revenue for each (banner_id, campaing_id) pair
-        total_revenues = Hash.new(Hash.new(0.0))
-        click_counts = Hash.new(Hash.new(0))
         CSV.foreach(File.dirname(__FILE__) +'/../csv/1/conversions_1.csv') do |row|
             conversion_id = row[0]
             click_id = row[1]
             revenue = row[2].to_f
-
-            banner_id = banner_by_click[click_id]
-            campaign_id = campaign_by_click[click_id]
-            if banner_id.nil? or campaign_id.nil?
-                # TODO report data inconsistency
-            elsif
-                total_revenues[campaign_id][banner_id] += revenue
-                click_counts[campaign_id][banner_id] += 1
-            end
+            calc.add_conversion(conversion_id, click_id, revenue)
         end
 
+        calc.calculate
+        return calc
     end
+
 end
