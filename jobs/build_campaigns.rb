@@ -13,23 +13,39 @@ module CampaignBuilder
         end
     end
 
+    def self.get_csv_file_num
+        time = Time.new
+        if time.min.between?(0, 14)
+            return '1'
+        elsif time.min.between?(15, 29)
+            return '2'
+        elsif time.min.between?(30, 44)
+            return '3'
+        elsif time.min.between?(45, 59)
+            return '4'
+        end
+    end
+
     def self.load_data
         calc = ConversionCalc.new
 
-        CSV.foreach(File.dirname(__FILE__) +'/../csv/1/impressions_1.csv') do |row|
+        csv_file_num = self.get_csv_file_num
+        folder = File.dirname(__FILE__) +'/../csv/' + csv_file_num
+
+        CSV.foreach("#{folder}/impressions_#{csv_file_num}.csv") do |row|
             banner_id = row[0]
             campaign_id = row[1]
             calc.add_impression(banner_id, campaign_id)
         end
 
-        CSV.foreach(File.dirname(__FILE__) +'/../csv/1/clicks_1.csv') do |row|
+        CSV.foreach("#{folder}/clicks_#{csv_file_num}.csv") do |row|
             click_id = row[0]
             banner_id = row[1]
             campaign_id = row[2]
             calc.add_click(click_id, banner_id, campaign_id)
         end
 
-        CSV.foreach(File.dirname(__FILE__) +'/../csv/1/conversions_1.csv') do |row|
+        CSV.foreach("#{folder}/conversions_#{csv_file_num}.csv") do |row|
             conversion_id = row[0]
             click_id = row[1]
             revenue = row[2].to_f
@@ -39,5 +55,4 @@ module CampaignBuilder
         calc.calculate
         return calc
     end
-
 end
