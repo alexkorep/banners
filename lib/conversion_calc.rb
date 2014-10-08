@@ -48,14 +48,12 @@ class ConversionCalc
         @campaigns[click.campaign_id][click.banner_id].revenue += amount
     end
 
-    def sort_compare(a, b)
-        if a.banner_performance.revenue
-            return a.banner_performance.revenue > b.banner_performance.revenue
-        end
-
-        return a.banner_performance.clicks > b.banner_performance.clicks
-    end
-
+    # Calculate top banners for provided campaign
+    # +campaign_id+:: id of campaign
+    # +campaign+:: campaign object, hash keyed by banner id with
+    #              BannerPerformance as values
+    # Algorithm complexity: O(N*lnN) where N is number of banners in campaign
+    # (based on sort algorithm complexity)
     def calculate_campaign(campaign_id, campaign)
         banners = Array.new
 
@@ -64,6 +62,9 @@ class ConversionCalc
         end
 
         # sort by revenue descending
+        # TODO since we only need to find maximum 10 top-performing banners,
+        # we can increase performance by finding them without sorting,
+        # which would give O(N) time complexity instead of O(N*lnN)
         banners.sort! do |a, b|
             if a.banner_performance.revenue
                 b.banner_performance.revenue <=> a.banner_performance.revenue
@@ -93,6 +94,10 @@ class ConversionCalc
         end
     end
 
+    # Find top-performing banners for all campaigns
+    # Time complexity: O(M*N*lnN) where M - number of campaigns,
+    # N - number of banners in campaign
+    # M*N is equal to the number of records in impressions.csv
     def calculate
         @campaigns.each_pair do |campaign_id, campaign|
             @top_banner_ids[campaign_id] = calculate_campaign(campaign_id,
@@ -100,6 +105,7 @@ class ConversionCalc
         end
     end
 
+    # Return top-performing banners for the given campaign
     def get_top_banner_ids(campaign_id)
         @top_banner_ids[campaign_id]
     end
