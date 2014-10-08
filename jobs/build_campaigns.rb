@@ -12,6 +12,8 @@ require "./lib/conversion_calc.rb"
 #       Redis namespace and swap these namespaces at the beginning of every 15
 #       minutes.
 module CampaignBuilder
+    @queue = :my_job_queue
+
     REDIS_EXPIRE_TIMEOUT = 16*60 #16 minutes
 
     def self.perform()
