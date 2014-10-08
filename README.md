@@ -123,3 +123,16 @@ Shortest transaction:	        0.35
 ```
 
 92 transaction per second gives 5520 transaction per minute.
+
+
+### Further performance optimizations
+#### Web
+In case of hight web load, web servers could be running undependently on mutiple hosts, load can be balanced through the load balancer. Each of them will access the same Redis which can become a bottleneck in this case.
+
+#### Background jobs
+In case when amount of banner displays/clicks/conversion is too high to be handled by a single worker job, it can be distributed among multiple hosts. Each host should be provided with different data: each campaign should be processed on one host only. Each job will access same Redis which, again, can become a bottleneck.
+
+#### Redis
+In case when Redis is becoming a botteneck for web or jobs, it can be clustered. However redis clustering is currently in alfa stage and I'm not sure if it can be used in produciton.
+
+As an alternative, we can use multiple Redis instances, each of them will handle its own set of campaigns. This would require some changes to the web and background jobs codebase.
